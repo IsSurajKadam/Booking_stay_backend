@@ -46,7 +46,7 @@ export const addTestimonial = async (req, res) => {
     });
 
    await sendEmail({
-  to: booking.email,
+  to: req.user.email,
   subject: "Thank You for Your Feedback 🙏",
   html: `
     <!doctype html>
