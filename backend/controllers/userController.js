@@ -49,7 +49,7 @@ export const register = catchAsyncErrors(async (req, res) => {
     provider: 'local' // Explicitly set provider to local
   });
 await sendEmail({
-  to: user.email,   // new user email
+  to: email,   // new user email
   subject: "Welcome to Trekkers 👋 – Registration Successful",
   html: `
   <!doctype html>
@@ -264,7 +264,7 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
     // send JWT and response (201 Created)
     sendToken(newUser, 201, res, "User registered successfully with Google");
     await sendEmail({
-  to: user.email,   // new user email
+  to: email,   // new user email
   subject: "Welcome to Trekkers 👋 – Registration Successful",
   html: `
   <!doctype html>
