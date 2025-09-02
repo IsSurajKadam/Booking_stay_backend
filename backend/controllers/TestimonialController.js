@@ -46,10 +46,51 @@ export const addTestimonial = async (req, res) => {
     });
 
    await sendEmail({
-     to: req.user.email,
-     subject: "Thank you for your testimonial!",
-     text: `Hi ${req.user.name},\n\nThank you for your feedback on your stay from ${booking.stayDate}. We appreciate your input!\n\nBest,\nThe BookingStay Team`
-   });
+  to: booking.email,
+  subject: "Thank You for Your Feedback 🙏",
+  html: `
+    <!doctype html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+    </head>
+    <body style="margin:0;padding:0;background-color:#f4f6f8;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td align="center" style="padding:24px 16px;">
+            <table width="600" cellpadding="0" cellspacing="0" role="presentation" 
+                   style="max-width:600px;background:#ffffff;border-radius:8px;
+                   overflow:hidden;box-shadow:0 6px 18px rgba(20,20,20,0.08);">
+
+              <tr>
+                <td style="padding:32px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;text-align:center;">
+                  <h1 style="margin:0;font-size:22px;font-weight:700;color:#0b2545;">
+                    Thank You for Your Feedback 🙏
+                  </h1>
+                  <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                    Hello <strong>${booking.name}</strong>,<br><br>
+                    Thank you for sharing your feedback on your stay from 
+                    <strong>${new Date("Sat Sep 27 2025 00:00:00 GMT+0000").toDateString()}</strong>.  
+                    We truly appreciate your input and it helps us improve our services.
+                  </p>
+                  <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                    We look forward to welcoming you again soon!
+                  </p>
+                  <p style="margin:30px 0 0;font-size:14px;color:#0f1724;font-weight:600;">
+                    Regards,<br>Suraj Kadam
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `
+});
 
     res.status(201).json({ success: true, testimonial,message: "Testimonial added successfully" });
   } catch (error) {
