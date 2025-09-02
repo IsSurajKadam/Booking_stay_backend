@@ -614,6 +614,71 @@ export const deleteBooking = async (req, res) => {
     }
 
     await booking.save({ session });
+    await sendEmail({
+  to: req.user.email,   // test email
+  subject: "Booking Cancelled ❌",
+  html: `
+  <!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f6f8;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td align="center" style="padding:24px 16px;">
+          <table width="600" cellpadding="0" cellspacing="0" role="presentation" 
+                 style="max-width:600px;background:#ffffff;border-radius:8px;
+                 overflow:hidden;box-shadow:0 6px 18px rgba(20,20,20,0.08);">
+
+            <!-- content -->
+            <tr>
+              <td style="padding:28px 36px 28px 36px;
+                         font-family:Arial, Helvetica, sans-serif;color:#0f1724;text-align:center;">
+                <h1 style="margin:0;font-size:22px;font-weight:700;color:#b91c1c;">
+                  Booking Cancelled ❌
+                </h1>
+                <p style="margin:16px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                  Hello <strong>${booking.name}</strong>,<br><br>
+                  Your booking has been successfully <strong>deleted</strong> from our system.  
+                </p>
+                <p style="margin:16px 0 0;font-size:14px;color:#6b7280;">
+                  If this was not intended or you have any concerns, please contact our support team.
+                </p>
+              </td>
+            </tr>
+
+            <!-- divider -->
+            <tr>
+              <td style="padding:0 36px;">
+                <hr style="border:none;border-top:1px solid #eef2f7;margin:0;">
+              </td>
+            </tr>
+
+            <!-- footer -->
+            <tr>
+              <td style="padding:18px 36px 28px;
+                         font-family:Arial, Helvetica, sans-serif;font-size:13px;color:#6b7280;text-align:center;">
+                <p style="margin:0 0 8px;">
+                  Need help? Contact us at 
+                  <a href="mailto:support@your-domain.com" style="color:#0b7bff;text-decoration:none;">
+                    support@your-domain.com
+                  </a>.
+                </p>
+                <p style="margin:0;font-size:12px;color:#9aa3b2;">
+                  &copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `
+});
 
     // 5️⃣ Hard delete if both flags are true
     if (booking.deletedBy.admin && booking.deletedBy.user) {
