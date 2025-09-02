@@ -4,6 +4,7 @@ import {sendToken }from '../utils/jwtToken.js';
 import { User } from '../models/User.model.js';
 import {OAuth2Client} from "google-auth-library"
 import {config} from "dotenv"
+import {sendEmail} from "../utils/emailService.js"
 config({
   path:"./config/config.env"
 });
@@ -47,7 +48,57 @@ export const register = catchAsyncErrors(async (req, res) => {
     isAdmin: role === "admin",
     provider: 'local' // Explicitly set provider to local
   });
+await sendEmail({
+  to: user.email,   // new user email
+  subject: "Welcome to Trekkers 👋 – Registration Successful",
+  html: `
+  <!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f6f8;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td align="center" style="padding:24px 16px;">
+          <table width="600" cellpadding="0" cellspacing="0" role="presentation" 
+                 style="max-width:600px;background:#ffffff;border-radius:8px;
+                 overflow:hidden;box-shadow:0 6px 18px rgba(20,20,20,0.08);">
 
+            <!-- content -->
+            <tr>
+              <td style="padding:32px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;text-align:center;">
+                <h1 style="margin:0;font-size:24px;font-weight:700;color:#0b2545;">
+                  Welcome to Trekkers 👋
+                </h1>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                  Hello <strong>${user.name}</strong>,<br><br>
+                  We’re thrilled to have you join our community! 🎉  
+                  Your registration has been successfully completed.  
+                </p>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                  From now on, you’ll receive important updates, stay informed about upcoming treks, and be part of our growing adventure family.  
+                </p>
+
+                <p style="margin:32px 0 0;font-size:14px;color:#0f1724;font-weight:600;">
+                  Regards,<br>Team Trekkers
+                </p>
+
+                <p style="margin-top:30px;font-size:12px;color:#9aa3b2;">
+                  This is an automated notification email. Please do not reply.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `
+});
   // Send JWT token in response
   sendToken(user, 201, res, 'User registered successfully');
 });
@@ -212,6 +263,57 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
 
     // send JWT and response (201 Created)
     sendToken(newUser, 201, res, "User registered successfully with Google");
+    await sendEmail({
+  to: user.email,   // new user email
+  subject: "Welcome to Trekkers 👋 – Registration Successful",
+  html: `
+  <!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f6f8;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td align="center" style="padding:24px 16px;">
+          <table width="600" cellpadding="0" cellspacing="0" role="presentation" 
+                 style="max-width:600px;background:#ffffff;border-radius:8px;
+                 overflow:hidden;box-shadow:0 6px 18px rgba(20,20,20,0.08);">
+
+            <!-- content -->
+            <tr>
+              <td style="padding:32px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;text-align:center;">
+                <h1 style="margin:0;font-size:24px;font-weight:700;color:#0b2545;">
+                  Welcome to Trekkers 👋
+                </h1>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                  Hello <strong>${user.name}</strong>,<br><br>
+                  We’re thrilled to have you join our community! 🎉  
+                  Your registration has been successfully completed.  
+                </p>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                  From now on, you’ll receive important updates, stay informed about upcoming treks, and be part of our growing adventure family.  
+                </p>
+
+                <p style="margin:32px 0 0;font-size:14px;color:#0f1724;font-weight:600;">
+                  Regards,<br>Team Trekkers
+                </p>
+
+                <p style="margin-top:30px;font-size:12px;color:#9aa3b2;">
+                  This is an automated notification email. Please do not reply.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `
+});
   } catch (err) {
     console.error("googleRegister error:", err);
     return res.status(401).json({ success: false, error: "Invalid Google token" });
