@@ -19,10 +19,10 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async ({ to, subject, text,html }) => {
   await transporter.sendMail({
-    from: process.env.SMTP_MAIL,
-    to,
-    subject,
-    text,
-    html
-  });
+  from: `"Trekkers" <${process.env.SMTP_MAIL}>`,  // ✅ shows name
+  to,
+  subject,
+  text,
+  html
+});
 };
