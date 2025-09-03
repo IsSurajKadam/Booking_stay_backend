@@ -17,12 +17,17 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const sendEmail = async ({ to, subject, text,html }) => {
-  await transporter.sendMail({
-  from: `"Trekkers" <${process.env.SMTP_MAIL}>`,  // ✅ shows name
-  to,
-  subject,
-  text,
-  html
-});
+export const sendEmail = async ({ to, subject, text, html }) => {
+  try {
+    const info = await transporter.sendMail({
+      from: `"Trekkers" <${process.env.SMTP_MAIL}>`,
+      to,
+      subject,
+      text,
+      html
+    });
+    console.log("✅ Email sent:", info.messageId);
+  } catch (err) {
+    console.error("❌ Email send error:", err);
+  }
 };
