@@ -76,7 +76,7 @@ export const register = catchAsyncErrors(async (req, res) => {
                   Welcome to Trekkers 👋
                 </h1>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  Hello <strong>${user}</strong>,<br><br>
+                  Hello <strong>${email}</strong>,<br><br>
                   We’re thrilled to have you join our community! 🎉  
                   Your registration has been successfully completed.  
                 </p>
@@ -289,7 +289,7 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
                   Welcome to Trekkers 👋
                 </h1>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  Hello <strong>${user}</strong>,<br><br>
+                  Hello <strong>${email}</strong>,<br><br>
                   We’re thrilled to have you join our community! 🎉  
                   Your registration has been successfully completed.  
                 </p>
