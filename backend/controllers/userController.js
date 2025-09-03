@@ -48,7 +48,10 @@ export const register = catchAsyncErrors(async (req, res) => {
     isAdmin: role === "admin",
     provider: 'local' // Explicitly set provider to local
   });
-await sendEmail({
+
+  // Send JWT token in response
+  sendToken(user, 201, res, 'User registered successfully');
+  await sendEmail({
   to: email,   // new user email
   subject: "Welcome to Trekkers 👋 – Registration Successful",
   html: `
@@ -73,12 +76,12 @@ await sendEmail({
                   Welcome to Trekkers 👋
                 </h1>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  Hello <strong>${user.name}</strong>,<br><br>
+                  Hello <strong>${user}</strong>,<br><br>
                   We’re thrilled to have you join our community! 🎉  
                   Your registration has been successfully completed.  
                 </p>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  From now on, you’ll receive important updates, stay informed about upcoming treks, and be part of our growing adventure family.  
+                  From now on, you’ll receive important updates, stay informed  and be part of our growing adventure family.  
                 </p>
 
                 <p style="margin:32px 0 0;font-size:14px;color:#0f1724;font-weight:600;">
@@ -99,8 +102,6 @@ await sendEmail({
   </html>
   `
 });
-  // Send JWT token in response
-  sendToken(user, 201, res, 'User registered successfully');
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
@@ -288,7 +289,7 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
                   Welcome to Trekkers 👋
                 </h1>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  Hello <strong>${user.name}</strong>,<br><br>
+                  Hello <strong>${user}</strong>,<br><br>
                   We’re thrilled to have you join our community! 🎉  
                   Your registration has been successfully completed.  
                 </p>
