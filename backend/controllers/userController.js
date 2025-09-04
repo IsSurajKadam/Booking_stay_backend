@@ -51,9 +51,9 @@ export const register = catchAsyncErrors(async (req, res) => {
 
   // Send JWT token in response
   sendToken(user, 201, res, 'User registered successfully');
-  await sendEmail({
+ await sendEmail({
   to: email,   // new user email
-  subject: "Welcome to Trekkers 👋 – Registration Successful",
+  subject: "करपेवाईडी होम स्टे मध्ये आपले स्वागत आहे 👋 – नोंदणी यशस्वी",
   html: `
   <!doctype html>
   <html>
@@ -73,23 +73,24 @@ export const register = catchAsyncErrors(async (req, res) => {
             <tr>
               <td style="padding:32px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;text-align:center;">
                 <h1 style="margin:0;font-size:24px;font-weight:700;color:#0b2545;">
-                  Welcome to Trekkers 👋
+                  करपेवाईडी होम स्टे मध्ये आपले स्वागत आहे 👋
                 </h1>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  Hello <strong>${email}</strong>,<br><br>
-                  We’re thrilled to have you join our community! 🎉  
-                  Your registration has been successfully completed.  
+                  नमस्कार <strong>${email}</strong>,<br><br>
+                  आम्हाला आनंद आहे की आपण आमच्या होम स्टे आणि जेवण सेवेसाठी नोंदणी केली आहे! 🎉  
+                  तुमची नोंदणी यशस्वीरीत्या पूर्ण झाली आहे.  
                 </p>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  From now on, you’ll receive important updates, stay informed  and be part of our growing adventure family.  
+                  आपल्या मुक्कामादरम्यान आम्ही आपल्याला आरामदायक मुक्काम आणि स्वादिष्ट जेवण अनुभव देऊ.  
+                  कोणत्याही बदलांसाठी किंवा प्रश्नांसाठी आम्हाला संपर्क साधा.  
                 </p>
 
                 <p style="margin:32px 0 0;font-size:14px;color:#0f1724;font-weight:600;">
-                  Regards,<br>Team Trekkers
+                  शुभेच्छा,<br>Team करपेवाईडी होम स्टे
                 </p>
 
                 <p style="margin-top:30px;font-size:12px;color:#9aa3b2;">
-                  This is an automated notification email. Please do not reply.
+                  हे स्वयंचलित सूचना ईमेल आहे. कृपया उत्तर देऊ नका.
                 </p>
               </td>
             </tr>
@@ -102,6 +103,7 @@ export const register = catchAsyncErrors(async (req, res) => {
   </html>
   `
 });
+
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
@@ -264,9 +266,9 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
 
     // send JWT and response (201 Created)
     sendToken(newUser, 201, res, "User registered successfully with Google");
-    await sendEmail({
+await sendEmail({
   to: email,   // new user email
-  subject: "Welcome to Trekkers 👋 – Registration Successful",
+  subject: "करपेवाईडी होम स्टे मध्ये आपले स्वागत आहे 👋 – नोंदणी यशस्वी",
   html: `
   <!doctype html>
   <html>
@@ -286,23 +288,24 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
             <tr>
               <td style="padding:32px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;text-align:center;">
                 <h1 style="margin:0;font-size:24px;font-weight:700;color:#0b2545;">
-                  Welcome to Trekkers 👋
+                  करपेवाईडी होम स्टे मध्ये आपले स्वागत आहे 👋
                 </h1>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  Hello <strong>${email}</strong>,<br><br>
-                  We’re thrilled to have you join our community! 🎉  
-                  Your registration has been successfully completed.  
+                  नमस्कार <strong>${email}</strong>,<br><br>
+                  आम्हाला आनंद आहे की आपण आमच्या होम स्टे आणि जेवण सेवेसाठी नोंदणी केली आहे! 🎉  
+                  तुमची नोंदणी यशस्वीरीत्या पूर्ण झाली आहे.  
                 </p>
                 <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
-                  From now on, you’ll receive important updates, stay informed about upcoming treks, and be part of our growing adventure family.  
+                  आपल्या मुक्कामादरम्यान आम्ही आपल्याला आरामदायक मुक्काम आणि स्वादिष्ट जेवण अनुभव देऊ.  
+                  कोणत्याही बदलांसाठी किंवा प्रश्नांसाठी आम्हाला संपर्क साधा.  
                 </p>
 
                 <p style="margin:32px 0 0;font-size:14px;color:#0f1724;font-weight:600;">
-                  Regards,<br>Team Trekkers
+                  शुभेच्छा,<br>Team करपेवाईडी होम स्टे
                 </p>
 
                 <p style="margin-top:30px;font-size:12px;color:#9aa3b2;">
-                  This is an automated notification email. Please do not reply.
+                  हे स्वयंचलित सूचना ईमेल आहे. कृपया उत्तर देऊ नका.
                 </p>
               </td>
             </tr>
@@ -315,6 +318,7 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
   </html>
   `
 });
+
   } catch (err) {
     console.error("googleRegister error:", err);
     return res.status(401).json({ success: false, error: "Invalid Google token" });
