@@ -262,7 +262,7 @@ if (event === "payment.captured") {
   await deleteTempBooking(bookingToken);
 await sendEmail({
   to: booking.email,
-  subject: "Booking Confirmation ✅",
+  subject: "बुकिंग पुष्टी ✅",
   html: `
   <!doctype html>
   <html>
@@ -279,32 +279,32 @@ await sendEmail({
             <!-- content -->
             <tr>
               <td style="padding:28px 36px 18px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;">
-                <h1 style="margin:0;font-size:20px;font-weight:700;color:#0b2545;">Booking Confirmation ✅</h1>
+                <h1 style="margin:0;font-size:20px;font-weight:700;color:#0b2545;">बुकिंग पुष्टी ✅</h1>
                 <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
-                  Hi <strong>${booking.name}</strong>,<br><br>
-                  Your booking <strong>#${booking._id}</strong> has been successfully confirmed.  
-                  Here are your booking details:
+                  नमस्कार <strong>${booking.name}</strong>,<br><br>
+                  तुमची बुकिंग <strong>#${booking._id}</strong> यशस्वीरीत्या निश्चित झाली आहे.  
+                  तुमच्या बुकिंगची माहिती खाली दिली आहे:
                 </p>
 
                 <!-- details card -->
                 <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;border:1px solid #e6e9ee;border-radius:8px;background:#fbfdff;">
                   <tr>
                     <td style="padding:14px 16px;font-size:14px;color:#334155;line-height:1.6;">
-                      <strong>Group Name:</strong> ${booking.groupName}<br>
-                      <strong>Accommodation:</strong> ${booking.accommodation}<br>
-                      <strong>Stay Date:</strong> ${new Date(booking.stayDate).toLocaleDateString()}<br>
-                      <strong>Stay Night(s):</strong> ${booking.stayNight}<br>
-                      <strong>Meal Type:</strong> ${booking.mealType}<br>
-                      <strong>Need Stay:</strong> ${booking.needStay ? "Yes" : "No"}<br>
-                      <strong>Group Size:</strong> ${booking.groupSize}<br><br>
+                      <strong>गट नाव:</strong> ${booking.groupName}<br>
+                      <strong>निवास प्रकार:</strong> ${booking.accommodation}<br>
+                      <strong>राहण्याची तारीख:</strong> ${new Date(booking.stayDate).toLocaleDateString("mr-IN", { day: "numeric", month: "long", year: "numeric" })}<br>
+                      <strong>राहण्याची रात्र:</strong> ${booking.stayNight}<br>
+                      <strong>जेवण प्रकार:</strong> ${booking.mealType}<br>
+                      <strong>निवास आवश्यक:</strong> ${booking.needStay ? "होय" : "नाही"}<br>
+                      <strong>गट आकार:</strong> ${booking.groupSize}<br><br>
 
-                      <strong>Payment Mode:</strong> ${booking.paymentMode}<br>
-                      <strong>Total Amount:</strong> ₹${booking.amount}<br>
-                      <strong>Deposit Amount:</strong> ₹${booking.depositAmount}<br>
-                      <strong>Remaining Amount:</strong> ₹${booking.remainingAmount}<br>
-                      <strong>Payment Status:</strong> ${booking.paymentStatus}<br><br>
+                      <strong>पेमेंट प्रकार:</strong> ${booking.paymentMode}<br>
+                      <strong>एकूण रक्कम:</strong> ₹${booking.amount}<br>
+                      <strong>अधि भरणा:</strong> ₹${booking.depositAmount}<br>
+                      <strong>बाकी रक्कम:</strong> ₹${booking.remainingAmount}<br>
+                      <strong>पेमेंट स्थिती:</strong> ${booking.paymentStatus}<br><br>
 
-                      <strong>Transaction ID:</strong> ${booking.transactionId}<br>
+                      <strong>ट्रान्झॅक्शन ID:</strong> ${booking.transactionId}<br>
                       <strong>Razorpay Order ID:</strong> ${booking.razorpayOrderId}<br>
                     </td>
                   </tr>
@@ -313,7 +313,7 @@ await sendEmail({
                 <!-- CTA -->
                 <p style="margin:18px 0 0;">
                   <a href="${booking.manageUrl ?? '#'}" style="display:inline-block;padding:10px 18px;border-radius:6px;background:#0b7bff;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;">
-                    Manage Booking
+                    बुकिंग व्यवस्थापित करा
                   </a>
                 </p>
               </td>
@@ -329,8 +329,8 @@ await sendEmail({
             <!-- footer -->
             <tr>
               <td style="padding:18px 36px 28px;font-family:Arial, Helvetica, sans-serif;font-size:13px;color:#6b7280;">
-                <p style="margin:0 0 8px;">If you have any questions, reply to this email or contact our support at <a href="mailto:support@your-domain.com" style="color:#0b7bff;text-decoration:none;">support@your-domain.com</a>.</p>
-                <p style="margin:0;font-size:12px;color:#9aa3b2;">&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
+                <p style="margin:0 0 8px;">काही प्रश्न असल्यास, या ईमेलला उत्तर देऊ नका किंवा आमच्या समर्थनाशी संपर्क साधा: <a href="mailto:support@your-domain.com" style="color:#0b7bff;text-decoration:none;">support@your-domain.com</a>.</p>
+                <p style="margin:0;font-size:12px;color:#9aa3b2;">&copy; ${new Date().getFullYear()} करपेवाईडी होम स्टे. सर्व हक्क राखीव.</p>
               </td>
             </tr>
           </table>
@@ -341,6 +341,7 @@ await sendEmail({
   </html>
   `
 });
+
 
 } else {
         console.log("❌ Payment failed, booking not created.");
@@ -387,11 +388,49 @@ await sendEmail({
         });
        await Payment.findByIdAndUpdate(paymentDocId._id,{refunded:true});
         const booking = await Booking.findById(refundReq.booking);
-        await sendEmail({
-          to: booking.email,
-          subject: "Refund Successful ✅",
-          text: `Hi ${booking.name}, your refund of ₹${amount} for booking ${booking._id} has been successfully credited to your bank account.`
-        });
+await sendEmail({
+  to: booking.email,
+  subject: "रिफंड यशस्वी ✅",
+  html: `
+  <!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f6f8;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td align="center" style="padding:24px 16px;">
+          <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(20,20,20,0.08);">
+            
+            <tr>
+              <td style="padding:28px 36px 18px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;">
+                <h1 style="margin:0;font-size:20px;font-weight:700;color:#0b2545;">रिफंड यशस्वी ✅</h1>
+                <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
+                  नमस्कार <strong>${booking.name}</strong>,<br><br>
+                  तुमच्या बुकिंग <strong>#${booking._id}</strong> साठी ₹${amount} रक्कम यशस्वीरीत्या तुमच्या बँक खात्यात जमा केली गेली आहे.
+                </p>
+
+                <p style="margin-top:32px;font-size:14px;color:#0f1724;font-weight:600;">
+                  शुभेच्छा,<br>Team करपेवाईडी होम स्टे
+                </p>
+
+                <p style="margin-top:30px;font-size:12px;color:#9aa3b2;">
+                  हे स्वयंचलित सूचना ईमेल आहे. कृपया उत्तर देऊ नका.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `
+});
+
 
       } else if (status === "failed") {
         refundReq.status = "failed";
@@ -800,12 +839,51 @@ export const cancelThenAutoRefund = async (req, res) => {
       ]
     }], { session });
 
-    await sendEmail({
-      to: booking.email,
-      subject: "Refund Request Initiated 🔄",
-      text: `Hi ${booking.name}, your refund request for booking on ${booking.stayDate} has been received.
-You will receive confirmation once the refund is processed.`
-    });
+await sendEmail({
+  to: booking.email,
+  subject: "रिफंड विनंती सुरू केली 🔄",
+  html: `
+  <!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+  <body style="margin:0;padding:0;background-color:#f4f6f8;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td align="center" style="padding:24px 16px;">
+          <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(20,20,20,0.08);">
+            
+            <tr>
+              <td style="padding:28px 36px 18px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;">
+                <h1 style="margin:0;font-size:20px;font-weight:700;color:#0b2545;">रिफंड विनंती प्राप्त झाली 🔄</h1>
+                <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
+                  नमस्कार <strong>${booking.name}</strong>,<br><br>
+                  तुमची बुकिंग <strong>${new Date(booking.stayDate).toLocaleDateString("mr-IN", { day: "numeric", month: "long", year: "numeric" })}</strong> साठी रिफंड विनंती आम्हाला प्राप्त झाली आहे.  
+                </p>
+                <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
+                  रिफंड प्रक्रिया पूर्ण झाल्यानंतर आम्ही तुम्हाला पुष्टी ईमेल पाठवू.
+                </p>
+
+                <p style="margin-top:32px;font-size:14px;color:#0f1724;font-weight:600;">
+                  शुभेच्छा,<br>Team करपेवाईडी होम स्टे
+                </p>
+
+                <p style="margin-top:30px;font-size:12px;color:#9aa3b2;">
+                  हे स्वयंचलित सूचना ईमेल आहे. कृपया उत्तर देऊ नका.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `
+});
 
     await session.commitTransaction();
     session.endSession();
