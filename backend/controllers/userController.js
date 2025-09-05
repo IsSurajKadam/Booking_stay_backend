@@ -12,7 +12,7 @@ const client=new OAuth2Client(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CL
 export const register = catchAsyncErrors(async (req, res) => {
   const { name, email, mobile, password, role, adminKey } = req.body;
 
-  // Validate required fields for local registration
+  // Validate required fields
   if (!name || !email || !mobile || !password || !role) {
     return res.status(400).json({ success: false, message: 'All fields are required.' });
   }
@@ -32,13 +32,16 @@ export const register = catchAsyncErrors(async (req, res) => {
     return res.status(403).json({ success: false, message: 'Invalid admin secret key.' });
   }
 
-  // Existing user check
-  const existing = await User.findOne({ email });
-  if (existing) {
-    return res.status(409).json({ success: false, message: 'Email is already registered.' });
+  // Check if email already exists (manual or Google)
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(409).json({
+      success: false,
+      message: 'Email is already registered. Please login.'
+    });
   }
 
-  // Create user with local provider
+  // Create new manual user
   const user = await User.create({ 
     name, 
     email, 
@@ -46,7 +49,7 @@ export const register = catchAsyncErrors(async (req, res) => {
     password, 
     role, 
     isAdmin: role === "admin",
-    provider: 'local' // Explicitly set provider to local
+    provider: 'local'
   });
 
   // Send JWT token in response
@@ -109,6 +112,7 @@ export const register = catchAsyncErrors(async (req, res) => {
 export const login = catchAsyncErrors(async (req, res, next) => {
   const { role, email, password } = req.body;
 
+  // Validate input
   if (!role || !email || !password) {
     return res.status(400).json({
       success: false,
@@ -116,40 +120,30 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     });
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  // Find user by email and provider 'local' only
+  const user = await User.findOne({ email, provider: 'local' }).select("+password");
 
   if (!user) {
     return res.status(401).json({
       success: false,
-      error: "Invalid email or password"
+      error: "Invalid email or password or role"
     });
   }
 
-  // Check if user registered with Google
-  if (user.provider === 'google') {
-    return res.status(400).json({
-      success: false,
-      error: "This account uses Google authentication. Please sign in with Google."
-    });
-  }
-
-  // Check if the password matches
+  // Check password
   const isPasswordMatched = await user.comparePassword(password);
   if (!isPasswordMatched) {
     return res.status(401).json({
       success: false,
-      error: "Invalid password"
+      error: "Invalid email or password or role"
     });
   }
 
-  // Check if the user's role matches the provided role
-  if (user.role !== role) {
-    return res.status(400).json({
-      success: false,
-      error: "Invalid user role"
-    });
-  }
+  // Check role
+ 
 
+
+  // Admin check
   if (role === "admin" && !user.isAdmin) {
     return next(new ErrorHandler("Unauthorized access. You are not an admin.", 403));
   }
@@ -157,56 +151,9 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res, "User login successfully");
 });
 
-export const googleLoginOnly = catchAsyncErrors(async (req, res, next) => {
+export const googleAuth = catchAsyncErrors(async (req, res, next) => {
   const { idToken } = req.body;
-
-  if (!idToken) {
-    return res.status(400).json({
-      success: false,
-      error: "Please provide Google ID token"
-    });
-  }
-
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    const { email, sub: googleId } = payload;
-
-    // Check if user exists
-    const user = await User.findOne({ email, provider: 'google' });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: "User not found. Please register first."
-      });
-    }
-
-    // Optional: verify googleId matches the stored one
-    if (user.googleId !== googleId) {
-      return res.status(401).json({
-        success: false,
-        error: "Google ID mismatch. Login failed."
-      });
-    }
-
-    // Send JWT
-    sendToken(user, 200, res, "User logged in successfully with Google");
-
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      error: "Invalid Google token"
-    });
-  }
-});
-
-export const googleRegister = catchAsyncErrors(async (req, res, next) => {
-  const { idToken} = req.body;
+ 
 
   if (!idToken) {
     return res.status(400).json({ success: false, error: "Please provide Google ID token" });
@@ -225,48 +172,28 @@ export const googleRegister = catchAsyncErrors(async (req, res, next) => {
       return res.status(400).json({ success: false, error: "Google account does not have an email" });
     }
 
-    // Check if a user already exists with this email
-    const existing = await User.findOne({ email });
+    // Check if user exists by googleId ONLY
+    let user = await User.findOne({ googleId });
 
-    if (existing) {
-      // If already registered using Google
-      if (existing.provider === "google") {
-        // Optional: check googleId match
-        if (existing.googleId && existing.googleId !== googleId) {
-          return res.status(409).json({
-            success: false,
-            error: "An account with this email is already registered with Google (different Google ID).",
-          });
-        }
-        return res.status(409).json({
-          success: false,
-          error: "User already registered with Google. Please login.",
-        });
-      }
-
-      // If registered manually with email/password
-      return res.status(409).json({
-        success: false,
-        error: "This email is already registered with manual authentication. Please login using email & password.",
+    if (user) {
+      // Existing Google user → login
+      sendToken(user, 200, res, "User logged in successfully with Google");
+    } else {
+      // Create new Google user regardless of email
+      const newUser = await User.create({
+        name,
+        email,
+        provider: "google",
+        googleId,
+        avatar: picture || null,
+        role: "trekker",
+        isAdmin: false,
       });
-    }
 
-    // Role handling: default to 'trekker'. Allow 'admin' only if correct adminKey provided.
+      
 
-
-    const newUser = await User.create({
-      name,
-      email,
-      provider: "google",
-      googleId,
-      avatar: picture || null,
-      role: "trekker",
-      isAdmin: false,
-    });
-
-    // send JWT and response (201 Created)
-    sendToken(newUser, 201, res, "User registered successfully with Google");
-await sendEmail({
+      sendToken(newUser, 201, res, "User registered successfully with Google");
+      await sendEmail({
   to: email,   // new user email
   subject: "करपेवाईडी होम स्टे मध्ये आपले स्वागत आहे 👋 – नोंदणी यशस्वी",
   html: `
@@ -318,9 +245,9 @@ await sendEmail({
   </html>
   `
 });
-
+    }
   } catch (err) {
-    console.error("googleRegister error:", err);
+    console.error("googleAuth error:", err);
     return res.status(401).json({ success: false, error: "Invalid Google token" });
   }
 });
