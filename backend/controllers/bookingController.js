@@ -802,6 +802,9 @@ export const cancelThenAutoRefund = async (req, res) => {
       refundableAmount = booking.depositAmount ?? booking.amount ?? 0;
     }
 
+        refundableAmount = refundableAmount * 0.75;
+refundableAmount = Math.round(refundableAmount);
+
     // Update booking & accommodation inside transaction
     booking.status = 'cancelled';
     booking.refundRequested = true;
@@ -858,10 +861,17 @@ await sendEmail({
             <tr>
               <td style="padding:28px 36px 18px 36px;font-family:Arial, Helvetica, sans-serif;color:#0f1724;">
                 <h1 style="margin:0;font-size:20px;font-weight:700;color:#0b2545;">रिफंड विनंती प्राप्त झाली 🔄</h1>
+                
                 <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
                   नमस्कार <strong>${booking.name}</strong>,<br><br>
-                  तुमची बुकिंग <strong>${new Date(booking.stayDate).toLocaleDateString("mr-IN", { day: "numeric", month: "long", year: "numeric" })}</strong> साठी रिफंड विनंती आम्हाला प्राप्त झाली आहे.  
+                  तुमची बुकिंग <strong>${new Date(booking.stayDate).toLocaleDateString("mr-IN", { day: "numeric", month: "long", year: "numeric" })}</strong> साठी रिफंड विनंती आम्हाला प्राप्त झाली आहे.
                 </p>
+
+                <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
+                  या रिफंडवर <strong>२५% कॅन्सलेशन शुल्क</strong> आकारले गेले आहे. त्यामुळे तुम्हाला परत मिळणारी रक्कम असेल:  
+                  <strong>₹${booking.refundAmount}</strong>
+                </p>
+
                 <p style="margin:12px 0 20px;font-size:15px;line-height:1.5;color:#4b5563;">
                   रिफंड प्रक्रिया पूर्ण झाल्यानंतर आम्ही तुम्हाला पुष्टी ईमेल पाठवू.
                 </p>
@@ -884,6 +894,7 @@ await sendEmail({
   </html>
   `
 });
+
 
     await session.commitTransaction();
     session.endSession();
