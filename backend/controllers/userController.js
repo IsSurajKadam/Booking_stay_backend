@@ -109,6 +109,26 @@ export const register = catchAsyncErrors(async (req, res) => {
 
 });
 
+export const checkMobile = async (req, res) => {
+  try {
+    const { number } = req.query;
+
+    if (!number || !/^\d{10}$/.test(number)) {
+      return res.status(400).json({ message: "वैध 10-अंकी मोबाइल नंबर द्या" });
+    }
+
+    const user = await User.findOne({ mobile: number });
+
+    if (user) {
+      return res.json({ available: false, message: "मोबाइल आधीपासून नोंदणीकृत आहे" });
+    } else {
+      return res.json({ available: true, message: "मोबाइल वापरण्यास उपलब्ध आहे" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ available: false, message: "सर्व्हर त्रुटी" });
+  }
+};
 export const login = catchAsyncErrors(async (req, res, next) => {
   const { role, email, password } = req.body;
 
